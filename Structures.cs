@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Linq;
 
 namespace AutoCJM
 {
@@ -41,18 +44,20 @@ namespace AutoCJM
         /// Генерирует CSV карту на основе CJM и записывает это в файл
         /// </summary>
         /// <param name="name">Название файла</param>
-        public string Build(string name = "CJM.csv")
+        public string Build(string name)
         {
-            int retries = 1;
-        FileOpen:
+            if(!Utils.ValidateFileName(name, out string corrName))
+            {
+                if (string.IsNullOrWhiteSpace(corrName))
+                {
+                    name = "AutoCJM";
+                }
+                name = corrName;
+            }
+            FileStart:
             try
             {
-                if (File.Exists(name))
-                {
-                    throw new IOException();
-                }
-
-                StreamWriter file = new StreamWriter(name, false, encoding: System.Text.Encoding.UTF8);
+                StreamWriter file = new StreamWriter($"{name}.csv", false, encoding: Encoding.UTF8);
                 for (int i = 0; i < plainMap.Count; i++)
                 {
                     for (int j = 0; j < plainMap[i].Count; j++)
@@ -64,13 +69,83 @@ namespace AutoCJM
                 }
                 file.Flush();
             }
-            catch (IOException)
+            catch
             {
-                // Мы обязательно найдём свободное название...
-                name = $"CJM-{retries++}.csv";
-                goto FileOpen;
+                // Ошибка записи, даём fallback имя
+                if(name != "AutoCJM")
+                    name = "AutoCJM";
+                else
+                {
+                    // Fallback уже был использован, сообщаем об ошибке
+                    throw new InvalidOperationException();
+                }
+                goto FileStart;
             }
             return name;
+        }
+    }
+
+    public static class Utils
+    {
+        public static bool ValidateFileName(string name)
+        {
+            try
+            {
+                FileStream fs = File.Open(name, FileMode.Open);
+                if (fs != null) fs.Close();
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (FileNotFoundException)
+            {
+                return true;
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            return true;
+        }
+ 
+        public static bool ValidateFileName(string name, out string corrected_name)
+        {
+            try
+            {
+                FileStream fs = File.Open(name, FileMode.Open);
+                if (fs != null) fs.Close();
+            }
+            catch (ArgumentException)
+            {
+                char[] banned = Path.GetInvalidFileNameChars();
+                StringBuilder sb = new StringBuilder();
+
+                foreach (char c in name)
+                {
+                    if (banned.Contains(c)) sb.Append('_');
+                    else sb.Append(c);
+                }
+
+                if (ValidateFileName(sb.ToString()) != false)
+                {
+                    corrected_name = sb.ToString();
+                }
+                else corrected_name = "";
+                return false;
+            }
+            catch (FileNotFoundException)
+            {
+                corrected_name = "";
+                return true;
+            }
+            catch (IOException)
+            {
+                corrected_name = "";
+                return true;
+            }
+            corrected_name = "";
+            return true;
         }
     }
 }

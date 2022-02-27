@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace AutoCJM
@@ -7,12 +8,12 @@ namespace AutoCJM
     public partial class MainForm : Form
     {
         public static readonly string botName = "CJ";
-        // cs = Current Step
-        public static int cs = -2;
-        public static int step = 1;
-        private Map cjm = new Map();
-        public static string upText = "";
-        public static string downText = "";
+        public static string filename = "";
+        public static int currentStep = -2;
+        public static int CJMStep = 1;
+        private Map CJMMap = new Map();
+        public static string stepText = "";
+        public static string reasonText = "";
         public static int rating;
 
         public MainForm()
@@ -20,10 +21,10 @@ namespace AutoCJM
             InitializeComponent();
             TheoryGroupBox.Dock = DockStyle.Fill;
             praticeGroupBox.Dock = DockStyle.Fill;
-            textPanel.Location = new Point(334, 190);
+            textPanel.Location = new Point(((Size.Width - 165) / 2) + 165 / 2, Size.Height / 2 - 50);
             chat.AppendText("Добро пожаловать в тестовую систему AutoCJM!", Color.Blue);
             chat.AppendText(Environment.NewLine);
-            chat.Bot("Используй поле ввода ниже для отправки сообщений!");
+            chat.Bot("Для начала работы напиши любое сообщение через поле ввода ниже");
         }
 
         private void exitButton_Click(object sender, EventArgs e)
@@ -77,38 +78,49 @@ namespace AutoCJM
         /* Выполнение кода разделено на этапи, и так как
          * WinForms не умеет в асинхронность (и я тоже)
          * я просто запускаю шаги как только пользователь
-         * что-то вводит.
-         */
+         * что-то вводит. */
         private void ExecuteStep(string input)
         {
-            if (cs != 2)
+            if (currentStep != 2)
             {
                 chat.AppendText(Environment.NewLine);
             }
             bool moveNext = true;
-            if (cs == -2)
+            if (currentStep == -2)
             {
                 chat.Bot("Отлично! Вы уже успели ознакомиться с теорией?");
                 chat.Bot("Я - Си Джи, помогу вам в составлении простого CJM");
-                cs = -1;
+                currentStep = -1;
             }
-            if (cs == -1)
+            if (currentStep == -1)
             {
                 chat.Bot("Для начала определимся с названием");
-                chat.AppendText($"Как называется ваш CJM?", Color.Green);
+                chat.AppendText($"Как называется ваш CJM? Рекомендуется назвать его короткой фразой из 2-5 слов", Color.Green);
             }
             // Шаг
-            else if (cs == 0)
+            else if (currentStep == 0)
             {
-                chat.Bot($"Опиши, каким был текущий шаг путешествия\nСейчас описывается шаг #{step}");
+                if (input.Length > 64)
+                {
+                    chat.AppendText("Имя файла слишком большое! Оно было сокращено до первых 64 символов.", Color.Red);
+                    filename = $"{input[0..^64]}";
+                    nameLabel.Text = $"Название CJM:\n{input[0..^64]}";
+                }
+                else
+                {
+                    filename = $"{input}";
+                    nameLabel.Text = $"Название CJM:\n{input}";
+
+                }
+                chat.Bot($"Опиши, каким был текущий шаг путешествия:");
             }
-            // Рейтинг
-            else if (cs == 1)
+            // Оценка шага
+            else if (currentStep == 1)
             {
-                upText = input.Trim();
+                stepText = input.Trim();
                 chat.Bot($"Каким было твоё настроение от 1 до 5 на этом шаге?\nГде 1 - Ужасно, а 5 - Отлично");
             }
-            else if (cs == 2)
+            else if (currentStep == 2)
             {
                 try
                 {
@@ -128,65 +140,48 @@ namespace AutoCJM
                     moveNext = false;
                     return;
                 }
-                cs++;
+                currentStep++;
             }
-            if (cs == 3)
+            if (currentStep == 3)
             {
                 chat.AppendText(Environment.NewLine);
                 chat.Bot("Теперь можешь описать причину, что вызвало у тебя такое настроение?");
             }
-            else if (cs == 4)
+            else if (currentStep == 4)
             {
-                downText = input;
+                reasonText = input;
                 chat.Bot("Взгляни на диалоговое окно. Всё указано верно?");
-                DialogResult result = MessageBox.Show($"[ Вот наш сгенерированный шаг: ]\n\nШаг: {upText}\nНастроение на шаге: {rating}/5 [{StrRating(rating)}]\nПричина настроения: {downText}\nДобавляем этот шаг в CJM?", "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                DialogResult result = MessageBox.Show($"[ Вот наш сгенерированный шаг: ]\n\nШаг: {stepText}\nНастроение на шаге: {rating}/5 [{StrRating(rating)}]\nПричина настроения: {reasonText}\nДобавляем этот шаг в CJM?", "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                 if (result == DialogResult.Yes)
                 {
-                    cjm.AddStep(upText, downText, rating);
+                    CJMMap.AddStep(stepText, reasonText, rating);
                     chat.User("Да - Добавить этот шаг");
-                    chat.Bot($"Отлично! Я добавил шаг #{step++} в наш CJM");
+                    chat.Bot($"Отлично! Я добавил шаг #{CJMStep++} в наш CJM");
                 }
                 else
                 {
                     chat.User("Нет - Переписать этот шаг");
-                    chat.Bot($"Хорошо, заполним шаг #{step} сначала?");
+                    chat.Bot($"Хорошо, заполним шаг #{CJMStep} сначала?");
                 }
-                cs = 0;
+                currentStep = 0;
 
-                if (step > 3)
+                if (CJMStep == 3)
                 {
                     chat.AppendText(Environment.NewLine);
-                    chat.Bot($"Приступаем к следующему шагу?");
-                    DialogResult result2;
-                    string showString = $"В CJM сейчас есть {step - 1} шагов\n [ Добавляем ещё один шаг? ]";
-                    if (step - 1 < 5)
-                    {
-                        showString = $"В CJM сейчас есть {step - 1} шага\n [ Добавляем ещё один шаг? ]";
-                    }
-
-                    result2 = MessageBox.Show(showString, "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (result2 != DialogResult.Yes)
-                    {
-                        chat.User("Нет, CJM нужно сохранить.");
-                        string filename = cjm.Build();
-                        chat.AppendText($"Файл был сохранён под названием {filename} в папке с программой", Color.Green);
-                        chat.AppendText($"Если вы хотите составить ещё один CJM, напишите что-нибудь в чат", Color.Green);
-                        cs = -2;
-                    }
-                    else
-                    {
-                        chat.User("Да, добавляем ещё один шаг");
-                    }
+                    chat.Bot($"Приступаем к следующему шагу.");
+                    chat.AppendText("Минимальное количество шагов записано!\nЕсли ты желаешь сохранить CJM, в любой момент ты можешь нажать на кнопку \"Завершить и сохранить\" справа", Color.Green);
+                    saveButton.Enabled = true;
                 }
-                if (cs != -2)
+                if (currentStep != -2)
                 {
                     chat.AppendText(Environment.NewLine);
-                    chat.Bot($"Опиши, каким был текущий шаг путешествия\nСейчас описывается шаг #{step}");
+                    chat.Bot($"Опиши, каким был текущий шаг путешествия:");
                 }
             }
             if (moveNext)
             {
-                cs++;
+                currentStep++;
+                stepsLabel.Text = $"Количество шагов: {CJMStep - 1}";
             }
         }
         // ################################ КОНЕЦ ######################################
@@ -225,12 +220,45 @@ namespace AutoCJM
             return "";
         }
 
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            string askString = $"Вы хотите сохранить текущий CJM \"{filename}\"?";
+            if (currentStep > 1)
+            {
+                askString += $"\nТекущий недозаполненный шаг \"{stepText}\" будет потерян!";
+            }
+            DialogResult result = MessageBox.Show(askString, "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    string RedactedName = CJMMap.Build(filename);
+                    inputBox.Text = "";
+                    filename = "";
+                    currentStep = -1;
+                    CJMStep = 1;
+                    stepsLabel.Text = "Количество шагов: 0";
+                    chat.AppendText(Environment.NewLine);
+                    if (RedactedName.StartsWith("AutoCJM"))
+                    {
+                        chat.AppendText("Похоже что нам не удалось сохранить файл под указанным названием и я дал ему автоматическое имя", Color.Red);
+                    }
+                    chat.AppendText($"CJM был сохранён в файл \"{RedactedName}.csv\" в папке с программой", Color.Green);
+                    chat.AppendText($"Чтобы составить ещё один CJM, напишите что-нибудь в чат!", Color.Green);
+                    saveButton.Enabled = false;
+                }
+                catch (InvalidOperationException)
+                {
+                    MessageBox.Show("Возникла ошибка записи в файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
     }
 
     public static class RichTextBoxExtensions
     {
         /// <summary>
-        /// Доавляет текст в поле чата с определённым цветом
+        /// Добавляет текст в поле чата с определённым цветом
         /// </summary>
         public static void AppendText(this RichTextBox box, string text, Color color, bool addNewLine = true)
         {

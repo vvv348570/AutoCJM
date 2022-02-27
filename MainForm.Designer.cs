@@ -41,7 +41,12 @@
             this.label3 = new System.Windows.Forms.Label();
             this.praticeGroupBox = new System.Windows.Forms.GroupBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.chat = new System.Windows.Forms.RichTextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.saveButton = new System.Windows.Forms.Button();
+            this.stepsLabel = new System.Windows.Forms.Label();
+            this.nameLabel = new System.Windows.Forms.Label();
             this.inputBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -55,6 +60,11 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.textPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -184,7 +194,7 @@
             this.praticeGroupBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.praticeGroupBox.Name = "praticeGroupBox";
             this.praticeGroupBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.praticeGroupBox.Size = new System.Drawing.Size(559, 495);
+            this.praticeGroupBox.Size = new System.Drawing.Size(705, 495);
             this.praticeGroupBox.TabIndex = 6;
             this.praticeGroupBox.TabStop = false;
             this.praticeGroupBox.Text = "Создание CJM";
@@ -192,7 +202,9 @@
             // 
             // splitContainer1
             // 
+            this.splitContainer1.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.IsSplitterFixed = true;
             this.splitContainer1.Location = new System.Drawing.Point(4, 19);
             this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.splitContainer1.Name = "splitContainer1";
@@ -200,15 +212,34 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.chat);
+            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.inputBox);
-            this.splitContainer1.Size = new System.Drawing.Size(551, 473);
+            this.splitContainer1.Size = new System.Drawing.Size(697, 473);
             this.splitContainer1.SplitterDistance = 414;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // splitContainer2
+            // 
+            this.splitContainer2.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.IsSplitterFixed = true;
+            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.chat);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox2);
+            this.splitContainer2.Size = new System.Drawing.Size(697, 414);
+            this.splitContainer2.SplitterDistance = 459;
+            this.splitContainer2.TabIndex = 1;
             // 
             // chat
             // 
@@ -219,9 +250,52 @@
             this.chat.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.chat.Name = "chat";
             this.chat.ReadOnly = true;
-            this.chat.Size = new System.Drawing.Size(551, 414);
+            this.chat.Size = new System.Drawing.Size(459, 414);
             this.chat.TabIndex = 0;
             this.chat.Text = "";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.saveButton);
+            this.groupBox2.Controls.Add(this.stepsLabel);
+            this.groupBox2.Controls.Add(this.nameLabel);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox2.Location = new System.Drawing.Point(0, 0);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(234, 414);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Информация";
+            // 
+            // saveButton
+            // 
+            this.saveButton.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.saveButton.Enabled = false;
+            this.saveButton.Location = new System.Drawing.Point(3, 373);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(228, 38);
+            this.saveButton.TabIndex = 2;
+            this.saveButton.Text = "Завершить и сохранить";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            // 
+            // stepsLabel
+            // 
+            this.stepsLabel.AutoSize = true;
+            this.stepsLabel.Location = new System.Drawing.Point(6, 62);
+            this.stepsLabel.Name = "stepsLabel";
+            this.stepsLabel.Size = new System.Drawing.Size(122, 15);
+            this.stepsLabel.TabIndex = 1;
+            this.stepsLabel.Text = "Количество шагов: 0";
+            // 
+            // nameLabel
+            // 
+            this.nameLabel.AutoSize = true;
+            this.nameLabel.Location = new System.Drawing.Point(6, 19);
+            this.nameLabel.Name = "nameLabel";
+            this.nameLabel.Size = new System.Drawing.Size(127, 15);
+            this.nameLabel.TabIndex = 0;
+            this.nameLabel.Text = "Название не выбрано";
             // 
             // inputBox
             // 
@@ -231,7 +305,7 @@
             this.inputBox.MaxLength = 500;
             this.inputBox.Multiline = true;
             this.inputBox.Name = "inputBox";
-            this.inputBox.Size = new System.Drawing.Size(551, 54);
+            this.inputBox.Size = new System.Drawing.Size(697, 54);
             this.inputBox.TabIndex = 1;
             this.inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
@@ -270,7 +344,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(762, 509);
+            this.ClientSize = new System.Drawing.Size(914, 509);
             this.Controls.Add(this.textPanel);
             this.Controls.Add(this.praticeGroupBox);
             this.Controls.Add(this.TheoryGroupBox);
@@ -293,6 +367,12 @@
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.textPanel.ResumeLayout(false);
             this.textPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -318,6 +398,11 @@
         private System.Windows.Forms.RichTextBox chat;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label stepsLabel;
+        private System.Windows.Forms.Label nameLabel;
+        private System.Windows.Forms.Button saveButton;
     }
 }
 
